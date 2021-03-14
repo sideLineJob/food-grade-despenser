@@ -3,9 +3,11 @@
 
 void SERVO_CONTROLLER::servoInit() {
   containerServo.attach(3);
+  dispenseServo.attach(A3);
   // set container 2..
 
   closeContainer();
+  closeDispenseContainer();
   // set container 2 to close 
 }
 
@@ -16,6 +18,16 @@ void SERVO_CONTROLLER::closeContainer() {
 
 void SERVO_CONTROLLER::openContainer() {
   containerServo.write(2);
+  delay(15);
+}
+
+void SERVO_CONTROLLER::closeDispenseContainer() {
+  dispenseServo.write(90);
+  delay(15);
+}
+
+void SERVO_CONTROLLER::openDispenseContainer() {
+  dispenseServo.write(2);
   delay(15);
 }
 
@@ -35,14 +47,22 @@ void SERVO_CONTROLLER::serialControlDispenser() {
   }
 }
 
-boolean SERVO_CONTROLLER::stopDispensing(float loadValue , float stopValue) {
+boolean SERVO_CONTROLLER::stopDispensing(float loadValue, float stopValue) {
 //  if (loadValue >= loadStopValue) {
 //    closeContainer();
 //  }
   if (loadValue >= stopValue) {
      closeContainer();
+//     closeDispenseContainer();
      return true;
   }
+  return false;
+}
 
+boolean SERVO_CONTROLLER::stopMainDispensing(float loadValue) {
+  if (loadValue < 5) {
+     closeDispenseContainer();
+     return true;
+  }
   return false;
 }

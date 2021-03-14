@@ -7,13 +7,14 @@ const int HX711_dout = 4; //mcu > HX711 dout pin
 const int HX711_sck = 5; //mcu > HX711 sck pin
 
 HX711_ADC LoadCell(HX711_dout, HX711_sck);
-SERVO_CONTROLLER containerCont;
+SERVO_CONTROLLER containerCont; 
 
 const int calVal_eepromAdress = 0;
 unsigned long t = 0;
 float loadValue = 0; // in mg
 float loadStopValue = 0;
 boolean startStopListening = false;
+boolean startStopMainContListening = false;
 
 // Coin slot
 const int coinInt = 0;
@@ -91,9 +92,18 @@ void loop() {
       lcd.setCursor(0, 1);
       lcd.print("Thank You!");
       resetDispender();
-
+      delay(1000);
+      // open main container 
+      containerCont.openDispenseContainer();
+      startStopMainContListening = true;
       delay(3000);
-     introText(); 
+      introText(); 
+    }
+  }
+
+  if (startStopMainContListening) {
+    if (containerCont.stopMainDispensing(loadValue)) {
+      startStopMainContListening = false;
     }
   }
 
@@ -186,24 +196,25 @@ void dispenserActions() {
 
 void dispensePowderTest() {
   // calculate load
-  int price_per_kilo = 50; // 5 peso per 1 kg
-  int mg_to_kg = 1000;
+  int price_per_kilo = 50;
+  int g_to_kg = 1000;
 
   float kgEquivalent = coinsValue / price_per_kilo;
-  loadStopValue = kgEquivalent * mg_to_kg;
-  float kg_eq = loadStopValue / mg_to_kg;
+  loadStopValue = kgEquivalent * g_to_kg;
+//  float kg_eq = loadStopValue / g_to_kg;
 
   lcd.clear();
   lcd.print("Despensing...");
   lcd.setCursor(0, 1);
   lcd.print(" = ");
   lcd.setCursor(4, 1);
-  lcd.print(String(kg_eq) + " kg");
+  lcd.print(String(kgEquivalent) + " kg");
 
   delay(3000);
   
   startStopListening = true;
   containerCont.openContainer();
+//  containerCont.openDispenseContainer();
 }
 
 void resetDispender() {
