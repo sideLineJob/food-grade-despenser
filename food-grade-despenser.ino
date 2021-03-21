@@ -173,12 +173,38 @@ void coinSlotAction() {
 
 void buttonActions() {
   int button1 = digitalRead(A0);
+  int button2 = digitalRead(A1);
+  int button3 = digitalRead(A2);
+  
   if (button1 == 1) {
     Serial.println("\nButton 1 pressed...\n");
-
     disableAllButtons = true;
     selectedButton = 1;
+    
+  } else if (button2 == 1) {
+    Serial.println("\nButton 2 pressed...\n");
+    disableAllButtons = true;
+    selectedButton = 2;
+    
+  } else if (button3 == 1) {
+    Serial.println("\nButton 3 pressed...\n");
+    disableAllButtons = true;
+    selectedButton = 3;
   }
+}
+
+
+void resetDispender() {
+  disableAllButtons = false;
+  startStopListening = false;
+  coinsValue = 0;
+}
+
+void introText() {
+  lcd.clear();
+  lcd.print("Please Insert");
+  lcd.setCursor(0, 1);
+  lcd.print("   Coin!");
 }
 
 void dispenserActions() {
@@ -201,7 +227,6 @@ void dispensePowderTest() {
 
   float kgEquivalent = coinsValue / price_per_kilo;
   loadStopValue = kgEquivalent * g_to_kg;
-//  float kg_eq = loadStopValue / g_to_kg;
 
   lcd.clear();
   lcd.print("Despensing...");
@@ -214,18 +239,4 @@ void dispensePowderTest() {
   
   startStopListening = true;
   containerCont.openContainer();
-//  containerCont.openDispenseContainer();
-}
-
-void resetDispender() {
-  disableAllButtons = false;
-  startStopListening = false;
-  coinsValue = 0;
-}
-
-void introText() {
-  lcd.clear();
-  lcd.print("Please Insert");
-  lcd.setCursor(0, 1);
-  lcd.print("   Coin!");
 }
