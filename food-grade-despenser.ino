@@ -7,13 +7,14 @@ const int HX711_dout = 4; //mcu > HX711 dout pin
 const int HX711_sck = 5; //mcu > HX711 sck pin
 
 HX711_ADC LoadCell(HX711_dout, HX711_sck);
-SERVO_CONTROLLER containerCont;
+SERVO_CONTROLLER containerCont; 
 
 const int calVal_eepromAdress = 0;
 unsigned long t = 0;
 float loadValue = 0; // in mg
 float loadStopValue = 0;
 boolean startStopListening = false;
+boolean startStopMainContListening = false;
 
 // Coin slot
 const int coinInt = 0;
@@ -26,6 +27,7 @@ LiquidCrystal lcd(12, 11, 7, 8, 9, 10);
 // Button vars
 boolean disableAllButtons = false;
 int selectedButton = 0;
+
 
 void setup() {
   Serial.begin(57600); 
@@ -91,9 +93,18 @@ void loop() {
       lcd.setCursor(0, 1);
       lcd.print("Thank You!");
       resetDispender();
-
+      delay(1000);
+      // open main container 
+      containerCont.openDispenseContainer();
+      startStopMainContListening = true;
       delay(3000);
-     introText(); 
+      introText(); 
+    }
+  }
+
+  if (startStopMainContListening) {
+    if (containerCont.stopMainDispensing(loadValue)) {
+      startStopMainContListening = false;
     }
   }
 
@@ -163,48 +174,26 @@ void coinSlotAction() {
 
 void buttonActions() {
   int button1 = digitalRead(A0);
+  int button2 = digitalRead(A1);
+  int button3 = digitalRead(A2);
+  
   if (button1 == 1) {
     Serial.println("\nButton 1 pressed...\n");
-
     disableAllButtons = true;
     selectedButton = 1;
+    
+  } else if (button2 == 1) {
+    Serial.println("\nButton 2 pressed...\n");
+    disableAllButtons = true;
+    selectedButton = 2;
+    
+  } else if (button3 == 1) {
+    Serial.println("\nButton 3 pressed...\n");
+    disableAllButtons = true;
+    selectedButton = 3;
   }
 }
 
-void dispenserActions() {
-  if (coinsValue > 0) { 
-    switch(selectedButton) {
-      case 1:
-        dispensePowderTest();
-    }
-  } else {
-    resetDispender();
-  }
-
-  selectedButton = 0;
-}
-
-void dispensePowderTest() {
-  // calculate load
-  int price_per_kilo = 50; // 5 peso per 1 kg
-  int mg_to_kg = 1000;
-
-  float kgEquivalent = coinsValue / price_per_kilo;
-  loadStopValue = kgEquivalent * mg_to_kg;
-  float kg_eq = loadStopValue / mg_to_kg;
-
-  lcd.clear();
-  lcd.print("Despensing...");
-  lcd.setCursor(0, 1);
-  lcd.print(" = ");
-  lcd.setCursor(4, 1);
-  lcd.print(String(kg_eq) + " kg");
-
-  delay(3000);
-  
-  startStopListening = true;
-  containerCont.openContainer();
-}
 
 void resetDispender() {
   disableAllButtons = false;
@@ -217,4 +206,49 @@ void introText() {
   lcd.print("Please Insert");
   lcd.setCursor(0, 1);
   lcd.print("   Coin!");
+}
+
+void dispenserActions() {
+  if (coinsValue > 0) { 
+    switch(selectedButton) {
+      case 1:
+        dispensePowderTest('A', 50);
+        containerCont.openContainer();
+        break;
+      case 2:
+        dispensePowderTest('B', 40);
+        containerCont.openContainer2();
+        break;
+      case 3:
+        dispensePowderTest('C', 30);
+        containerCont.openContainer3();
+        break;
+    }
+  } else {
+    resetDispender();
+  }
+
+  selectedButton = 0;
+}
+
+void dispensePowderTest(char dType, float price) {
+  // calculate load
+  int price_per_kilo = price;
+  int g_to_kg = 1000;
+
+  float kgEquivalent = coinsValue / price_per_kilo;
+  loadStopValue = kgEquivalent * g_to_kg;
+
+  lcd.clear();
+  lcd.print("Despensing ");
+  lcd.print(dType);
+  lcd.print("...");
+  lcd.setCursor(0, 1);
+  lcd.print(" = ");
+  lcd.setCursor(4, 1);
+  lcd.print(String(kgEquivalent) + " kg");
+
+  delay(3000);
+  
+  startStopListening = true;
 }
