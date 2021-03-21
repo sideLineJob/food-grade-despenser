@@ -28,6 +28,7 @@ LiquidCrystal lcd(12, 11, 7, 8, 9, 10);
 boolean disableAllButtons = false;
 int selectedButton = 0;
 
+
 void setup() {
   Serial.begin(57600); 
   delay(10);
@@ -211,7 +212,17 @@ void dispenserActions() {
   if (coinsValue > 0) { 
     switch(selectedButton) {
       case 1:
-        dispensePowderTest();
+        dispensePowderTest('A', 50);
+        containerCont.openContainer();
+        break;
+      case 2:
+        dispensePowderTest('B', 40);
+        containerCont.openContainer();
+        break;
+      case 3:
+        dispensePowderTest('C', 30);
+        containerCont.openContainer();
+        break;
     }
   } else {
     resetDispender();
@@ -220,16 +231,18 @@ void dispenserActions() {
   selectedButton = 0;
 }
 
-void dispensePowderTest() {
+void dispensePowderTest(char dType, float price) {
   // calculate load
-  int price_per_kilo = 50;
+  int price_per_kilo = price;
   int g_to_kg = 1000;
 
   float kgEquivalent = coinsValue / price_per_kilo;
   loadStopValue = kgEquivalent * g_to_kg;
 
   lcd.clear();
-  lcd.print("Despensing...");
+  lcd.print("Despensing ");
+  lcd.print(dType);
+  lcd.print("...");
   lcd.setCursor(0, 1);
   lcd.print(" = ");
   lcd.setCursor(4, 1);
@@ -238,5 +251,4 @@ void dispensePowderTest() {
   delay(3000);
   
   startStopListening = true;
-  containerCont.openContainer();
 }

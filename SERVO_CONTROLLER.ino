@@ -48,12 +48,8 @@ void SERVO_CONTROLLER::serialControlDispenser() {
 }
 
 boolean SERVO_CONTROLLER::stopDispensing(float loadValue, float stopValue) {
-//  if (loadValue >= loadStopValue) {
-//    closeContainer();
-//  }
   if (loadValue >= stopValue) {
      closeContainer();
-//     closeDispenseContainer();
      return true;
   }
   return false;
