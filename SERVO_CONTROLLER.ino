@@ -3,6 +3,8 @@
 
 void SERVO_CONTROLLER::servoInit() {
   containerServo.attach(3);
+  containerServo2.attach(A4);
+  containerServo3.attach(A5);
   dispenseServo.attach(A3);
   // set container 2..
 
@@ -13,11 +15,23 @@ void SERVO_CONTROLLER::servoInit() {
 
 void SERVO_CONTROLLER::closeContainer() {
   containerServo.write(90);
+  containerServo2.write(90);
+  containerServo3.write(90);
   delay(15);
 }
 
 void SERVO_CONTROLLER::openContainer() {
   containerServo.write(2);
+  delay(15);
+}
+
+void SERVO_CONTROLLER::openContainer2() {
+  containerServo2.write(2);
+  delay(15);
+}
+
+void SERVO_CONTROLLER::openContainer3() {
+  containerServo3.write(2);
   delay(15);
 }
 

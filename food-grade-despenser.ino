@@ -217,11 +217,11 @@ void dispenserActions() {
         break;
       case 2:
         dispensePowderTest('B', 40);
-        containerCont.openContainer();
+        containerCont.openContainer2();
         break;
       case 3:
         dispensePowderTest('C', 30);
-        containerCont.openContainer();
+        containerCont.openContainer3();
         break;
     }
   } else {
