@@ -87,7 +87,20 @@ void loop() {
   containerCont.serialControlDispenser();
 
   if (startStopListening) {
-    if (containerCont.stopDispensing(loadValue, loadStopValue)) {
+
+    /**
+     * ex.
+     * loadStopValue = 100
+     * get 5% from loadStopValue(Threshold)
+     * threshold = 5%
+     * loadStopValue = loadStopValue - (loadStopValue * 5%)
+     */
+
+    float threshold = 0.05; // 5 percent threshold
+
+    float valueWithThreshold = loadStopValue - (loadStopValue * threshold);
+    
+    if (containerCont.stopDispensing(loadValue, valueWithThreshold)) { // replace "loadStopValue" with "valueWithThreshold"
       lcd.clear();
       lcd.print("Done Dispensing!");
       lcd.setCursor(0, 1);
