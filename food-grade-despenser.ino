@@ -28,6 +28,7 @@ LiquidCrystal lcd(12, 11, 7, 8, 9, 10);
 boolean disableAllButtons = false;
 int selectedButton = 0;
 
+int containerNumber = 0;
 
 void setup() {
   Serial.begin(57600); 
@@ -96,9 +97,23 @@ void loop() {
      * loadStopValue = loadStopValue - (loadStopValue * 5%)
      */
 
-    float threshold = 0.05; // 5 percent threshold
+    float threshold_tank1 = 0.05; // 5 percent threshold
+    float threshold_tank2 = 0.05; 
+    float threshold_tank3 = 0.05;
 
-    float valueWithThreshold = loadStopValue - (loadStopValue * threshold);
+    float valueWithThreshold = 0;
+
+    switch (containerNumber) {
+      case 1:
+        valueWithThreshold = loadStopValue - (loadStopValue * threshold_tank1);
+        break;
+      case 2:
+        valueWithThreshold = loadStopValue - (loadStopValue * threshold_tank2);
+        break; 
+      case 3:
+        valueWithThreshold = loadStopValue - (loadStopValue * threshold_tank3);
+        break; 
+    }
     
     if (containerCont.stopDispensing(loadValue, valueWithThreshold)) { // replace "loadStopValue" with "valueWithThreshold"
       lcd.clear();
@@ -227,14 +242,17 @@ void dispenserActions() {
       case 1:
         dispensePowderTest('A', 50);
         containerCont.openContainer();
+        containerNumber = 1;
         break;
       case 2:
         dispensePowderTest('B', 40);
         containerCont.openContainer2();
+        containerNumber = 2;
         break;
       case 3:
         dispensePowderTest('C', 30);
         containerCont.openContainer3();
+        containerNumber = 3;
         break;
     }
   } else {
